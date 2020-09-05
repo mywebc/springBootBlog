@@ -1,10 +1,13 @@
 package hello.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.Instant;
 
 public class User {
     Integer id;
     String username;
+    @JsonIgnore
     String encryptePassword;
     String avatar;
     Instant updatedAt;

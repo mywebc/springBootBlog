@@ -6,6 +6,10 @@ public class Result {
     boolean isLogin;
     Object data;
 
+    public static Result failure(String msg){
+        return new Result("fail",msg,false);
+    }
+
     public Result(String status, String msg, boolean isLogin) {
         this(status, msg, isLogin, null);
     }

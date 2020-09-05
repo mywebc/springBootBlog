@@ -10,21 +10,17 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class UserService implements UserDetailsService {
     private UserMapper userMapper;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private Map<String, User> users = new ConcurrentHashMap<>();
 
     @Inject
     public UserService(BCryptPasswordEncoder bCryptPasswordEncoder, UserMapper userMapper) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userMapper = userMapper;
-        save("root", "root");
+//        save("root", "root");
     }
 
 //    public UserService() {
