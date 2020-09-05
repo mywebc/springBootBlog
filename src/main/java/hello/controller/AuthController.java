@@ -1,5 +1,6 @@
 package hello.controller;
 
+import hello.entity.Result;
 import hello.entity.User;
 import hello.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,7 +8,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +38,7 @@ public class AuthController {
         User loggedInUser = userService.getUserByUsername(username);
 
         if (loggedInUser == null) {
-            return new Result("ok", "用户没有登录", false);
+            return new Result("ok", "用户没有登录", false,null);
         } else {
             return new Result("ok", null, true, loggedInUser);
         }
@@ -52,8 +52,9 @@ public class AuthController {
         UserDetails userDetails;
         try {
             userDetails = userService.loadUserByUsername(username);
+            System.out.println(userDetails);
         } catch (UsernameNotFoundException e) {
-            return new Result("fail", "用户不存在", false);
+            return new Result("fail", "用户不存在", false,null);
         }
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
         try {
@@ -61,39 +62,53 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(token);
             return new Result("ok", "登录成功", true, userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
-            return new Result("fail", "密码不正确", false);
+            return new Result("fail", "密码不正确", false,null);
         }
     }
 
-    public static class Result {
-        String status;
-        String msg;
-        Boolean isLoginIn;
-        Object data;
-
-        public Result(String status, String msg, Boolean isLoginIn) {
-            this(status, msg, isLoginIn, null);
-        }
-
-        public Result(String status, String msg, Boolean isLoginIn, Object data) {
-            this.status = status;
-            this.msg = msg;
-            this.isLoginIn = isLoginIn;
-            this.data = data;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
-        public Boolean getLoginIn() {
-            return isLoginIn;
-        }
-    }
-
-
+//    public static class Result {
+//        String status;
+//        String msg;
+//        Boolean isLoginIn;
+//        Object data;
+//
+////        public Result(String status, String msg, Boolean isLoginIn, Object data) {
+////            this(status, msg, isLoginIn, data);
+////        }
+//
+//        public Result(String status, String msg, Boolean isLoginIn, Object data) {
+//            this.status = status;
+//            this.msg = msg;
+//            this.isLoginIn = isLoginIn;
+//            this.data = data;
+//        }
+//
+//        public String getStatus() {
+//            return status;
+//        }
+//
+//        public void setStatus(String status) {
+//            this.status = status;
+//        }
+//
+//        public String getMsg() {
+//            return msg;
+//        }
+//
+//        public void setMsg(String msg) {
+//            this.msg = msg;
+//        }
+//
+//        public Boolean getLoginIn() {
+//            return isLoginIn;
+//        }
+//
+//        public Object getData() {
+//            return data;
+//        }
+//
+//        public void setData(Object data) {
+//            this.data = data;
+//        }
+//    }
 }

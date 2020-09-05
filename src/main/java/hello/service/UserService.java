@@ -16,12 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class UserService implements UserDetailsService {
+    private UserMapper userMapper;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private Map<String, User> users = new ConcurrentHashMap<>();
 
     @Inject
-    public UserService(BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(BCryptPasswordEncoder bCryptPasswordEncoder, UserMapper userMapper) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userMapper = userMapper;
         save("root", "root");
     }
 
@@ -29,26 +31,21 @@ public class UserService implements UserDetailsService {
 //        userPasswords.put("root","root");
 //    }
 
-    public void save(String usename, String password) {
-        users.put(usename, new User(1, usename, bCryptPasswordEncoder.encode(password)));
+    public void save(String username, String password) {
+        userMapper.save(username, bCryptPasswordEncoder.encode(password));
     }
 
-//
-//    public User getUserById(Integer id) {
-//        return null;
-//    }
-
     public User getUserByUsername(String username) {
-        return users.get(username);
+        return userMapper.findUserByUsername(username);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (!users.containsKey(username)) {
+        User user = getUserByUsername(username);
+
+        if (user == null) {
             throw new UsernameNotFoundException(username + "不存在");
         }
-
-        User user = users.get(username);
 
         return new org.springframework.security.core.userdetails.User(username, user.getEncryptePassword(), Collections.emptyList());
     }
