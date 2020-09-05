@@ -1,6 +1,7 @@
 package hello.controller;
 
 import hello.entity.User;
+import hello.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,21 +19,29 @@ import javax.inject.Inject;
 import java.util.Map;
 
 @Controller
-
 public class AuthController {
-    private UserDetailsService userDetailsService;
     private AuthenticationManager authenticationManager;
+    private UserService userService;
 
     @Inject
-    public AuthController(UserDetailsService userDetailsService, AuthenticationManager authenticationManager) {
-        this.userDetailsService = userDetailsService;
+    public AuthController(AuthenticationManager authenticationManager, UserService userService) {
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
     }
 
     @GetMapping("/auth")
     @ResponseBody
     public Object auth() {
-        return new Result("ok", "", false);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 通过查看username是否存在判断用户是否登录
+        User loggedInUser = userService.getUserByUsername(username);
+
+        if (loggedInUser == null) {
+            return new Result("ok", "用户没有登录", false);
+        } else {
+            return new Result("ok", null, true, loggedInUser);
+        }
     }
 
     @PostMapping("/auth/login")
@@ -40,9 +49,9 @@ public class AuthController {
     public Result login(@RequestBody Map<String, Object> request) {
         String username = request.get("username").toString();
         String password = request.get("password").toString();
-        UserDetails userDetails = null;
+        UserDetails userDetails;
         try {
-            userDetails = userDetailsService.loadUserByUsername(username);
+            userDetails = userService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
             return new Result("fail", "用户不存在", false);
         }
@@ -50,8 +59,7 @@ public class AuthController {
         try {
             authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(token);
-            User hasLoginUser = new User(1, "张三");
-            return new Result("ok", "登录成功", true, hasLoginUser);
+            return new Result("ok", "登录成功", true, userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
             return new Result("fail", "密码不正确", false);
         }

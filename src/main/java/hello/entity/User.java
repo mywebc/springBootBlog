@@ -5,13 +5,15 @@ import java.time.Instant;
 public class User {
     Integer id;
     String username;
+    String encryptePassword;
     String avatar;
     Instant updatedAt;
     Instant createdAt;
 
-    public User(Integer id,String name) {
+    public User(Integer id, String username, String encryptePassword) {
         this.id = id;
-        this.username = name;
+        this.username = username;
+        this.encryptePassword = encryptePassword;
         this.avatar = "";
         this.updatedAt = Instant.now();
         this.createdAt = Instant.now();
@@ -25,27 +27,43 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return username;
-    }
-
-    public void setName(String name) {
-        this.username = name;
-    }
-
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEncryptePassword() {
+        return encryptePassword;
+    }
+
+    public void setEncryptePassword(String encryptePassword) {
+        this.encryptePassword = encryptePassword;
     }
 
     public String getAvatar() {
         return avatar;
     }
 
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     public Instant getUpdatedAt() {
         return updatedAt;
     }
 
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 }
