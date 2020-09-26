@@ -1,5 +1,6 @@
 package hello.controller;
 
+import hello.entity.LoginResult;
 import hello.entity.Result;
 import hello.entity.User;
 import hello.service.UserService;
@@ -33,7 +34,7 @@ public class AuthController {
 
     @GetMapping("/auth")
     @ResponseBody
-    public Object auth() {
+    public Result auth() {
 //        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -41,9 +42,9 @@ public class AuthController {
         User loggedInUser = userService.getUserByUsername(authentication == null ? null : authentication.getName());
 
         if (loggedInUser == null) {
-            return Result.failure("user not login in");
+            return LoginResult.failure("user not login in");
         } else {
-            return new Result("ok", "success", true, loggedInUser);
+            return LoginResult.success("success", true, loggedInUser);
         }
     }
 
@@ -56,10 +57,10 @@ public class AuthController {
         User loggedInUser = userService.getUserByUsername(username);
 
         if (loggedInUser == null) {
-            return Result.failure("user not login in");
+            return LoginResult.failure("user not login in");
         } else {
             SecurityContextHolder.clearContext();
-            return new Result("ok", "注销成功", true,null);
+            return LoginResult.success( "注销成功", true,null);
         }
     }
 
@@ -72,15 +73,15 @@ public class AuthController {
         try {
             userDetails = userService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
-            return Result.failure("用户不存在");
+            return LoginResult.failure("用户不存在");
         }
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
         try {
             authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(token);
-            return new Result("ok", "login in success", true, userService.getUserByUsername(username));
+            return LoginResult.success( "login in success", true, userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
-            return Result.failure( "密码不正确");
+            return LoginResult.failure( "密码不正确");
         }
     }
 
@@ -90,23 +91,23 @@ public class AuthController {
         String username = (String) request.get("username");
         String password = (String) request.get("password");
         if (username == null || password == null) {
-            return Result.failure("username/password == null");
+            return LoginResult.failure("username/password == null");
         }
         if (username.length() < 1 || username.length() > 15) {
-            return Result.failure("username/password length invalid");
+            return LoginResult.failure("username/password length invalid");
         }
         if (password.length() < 1 || password.length() > 15) {
-            return Result.failure("invalid password");
+            return LoginResult.failure("invalid password");
         }
 
         try {
             userService.save(username, password);
         } catch (DuplicateKeyException e) {
-            return Result.failure( "user already exists");
+            return LoginResult.failure( "user already exists");
         }
 //        login(request, request);
 //        return LoginResult.success("注册成功", userService.getUserByUsername(username));
-        return new Result("success", "注册成功", false);
+        return LoginResult.success( "注册成功", false);
 
     }
 }
