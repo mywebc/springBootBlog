@@ -60,28 +60,34 @@ public class AuthController {
             return LoginResult.failure("user not login in");
         } else {
             SecurityContextHolder.clearContext();
-            return LoginResult.success( "注销成功", true,null);
+            return LoginResult.success("注销成功", true, null);
         }
     }
 
     @PostMapping("/auth/login")
     @ResponseBody
-    public Result login(@RequestBody Map<String, Object> request) {
-        String username = request.get("username").toString();
-        String password = request.get("password").toString();
+    public Result login(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String password = request.get("password");
         UserDetails userDetails;
         try {
+            // 根据用户名查找用户相关信息
             userDetails = userService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
             return LoginResult.failure("用户不存在");
         }
+        // UsernamePasswordAuthenticationToken是Authentication的实现类，封装了用户的信息，包括用户名、密码、权限等，用于鉴权，
+        // 是一个不可变对象，创建后不可更改，所以需要重新创建一个对象，然后设置到SecurityContextHolder中，这样才能保证用户登录成功，否则会报错。
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
         try {
+            // 通过AuthenticationManager的authenticate方法实现登录，该方法会调用UserDetailsService的loadUserByUsername方法获取用户信息
             authenticationManager.authenticate(token);
+            // 如果鉴权成功，将用户信息存储到SecurityContextHolder中，方便获取用户信息，如用户名、权限等，
+            // 这样就可以通过SecurityContextHolder.getContext().getAuthentication()获取用户信息，如用户名、权限等。
             SecurityContextHolder.getContext().setAuthentication(token);
-            return LoginResult.success( "login in success", true, userService.getUserByUsername(username));
+            return LoginResult.success("login in success", true, userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
-            return LoginResult.failure( "密码不正确");
+            return LoginResult.failure("密码不正确");
         }
     }
 
@@ -103,11 +109,11 @@ public class AuthController {
         try {
             userService.save(username, password);
         } catch (DuplicateKeyException e) {
-            return LoginResult.failure( "user already exists");
+            return LoginResult.failure("user already exists");
         }
 //        login(request, request);
 //        return LoginResult.success("注册成功", userService.getUserByUsername(username));
-        return LoginResult.success( "注册成功", false);
+        return LoginResult.success("注册成功", false);
 
     }
 }
