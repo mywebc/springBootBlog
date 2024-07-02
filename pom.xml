@@ -109,6 +109,7 @@
                     </includes>
                 </configuration>
             </plugin>
+            <!-- flyway 插件 -->
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
