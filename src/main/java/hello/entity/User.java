@@ -7,6 +7,7 @@ import java.time.Instant;
 public class User {
     Integer id;
     String username;
+    // @JsonIgnore注解表示在序列化时忽略encryptePassword字段
     @JsonIgnore
     String encryptePassword;
     String avatar;

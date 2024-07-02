@@ -35,7 +35,7 @@ public class AuthController {
     @GetMapping("/auth")
     @ResponseBody
     public Result auth() {
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        // 通过SecurityContextHolder.getContext().getAuthentication()获取用户信息，如用户名、权限等
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 通过查看username是否存在判断用户是否登录
@@ -107,6 +107,7 @@ public class AuthController {
         }
 
         try {
+            // 这里可以直接进行保存，数据库里的username字段是unique的，如果重复会抛出DuplicateKeyException异常
             userService.save(username, password);
         } catch (DuplicateKeyException e) {
             return LoginResult.failure("user already exists");

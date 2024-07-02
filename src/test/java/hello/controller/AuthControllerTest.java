@@ -40,8 +40,10 @@ class AuthControllerTest {
 
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
+    // 在每个测试方法运行前构建MockMvc对象
     @BeforeEach
     void setUp() {
+        // 构建MockMvc对象
         mvc = MockMvcBuilders.standaloneSetup(new AuthController(authenticationManager, userService)).build();
     }
 

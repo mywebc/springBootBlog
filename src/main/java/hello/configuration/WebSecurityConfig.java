@@ -19,7 +19,7 @@ import javax.inject.Inject;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Inject
-     private UserService userService;
+    private UserService userService;
 //
 //    @Inject
 //    public WebSecurityConfig(UserService userService) {
@@ -40,13 +40,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authenticationManager();
     }
 
+    // 通过重载，配置user-detail服务
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        // 设置自定义的UserDetailsService，用于从数据库中获取用户信息，比如密码，权限等，这里使用我们自己实现的UserService
         auth.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder());
     }
 
+    // 通过@Bean注解，将BCryptPasswordEncoder注册到Spring容器中,这是spring官方提供的服务
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        // 返回一个BCryptPasswordEncoder实例,用于密码加密
         return new BCryptPasswordEncoder();
     }
 
